@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Test Says Yes</title>
+<style>
+  :root { --ink:#1f1f1f; --paper:#f7f6f2; --line:#c9c7c1; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink); font: 16px/1.5 Georgia, serif; }
+  main { width: min(880px, calc(100% - 28px)); margin: 0 auto; padding: 28px 0 48px; }
+  a { color: inherit; }
+  h1 { font-weight: 400; font-size: clamp(32px, 6vw, 52px); letter-spacing:-.03em; margin: 8px 0; }
+  .dots { display:grid; grid-template-columns: repeat(40, 1fr); gap: 3px; margin: 18px 0; }
+  .dot { width:100%; aspect-ratio:1; border-radius:50%; background:#1f1f1f; }
+  .dot.sick { box-shadow: inset 0 0 0 2px #a13c34; background:#f3d2cf; }
+  .dot.pos { outline: 2px solid #1f1f1f; outline-offset: 1px; }
+  .dot.hidden { opacity: .12; }
+  label { display:grid; grid-template-columns: 1fr auto; gap: 8px; font: 13px/1.3 ui-sans-serif, system-ui, sans-serif; margin: 10px 0; }
+  input[type=range] { width: 100%; }
+  button, .preset { font: 12px/1 ui-sans-serif, system-ui, sans-serif; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--ink); background:transparent; padding:8px 10px; margin: 4px 6px 4px 0; cursor:pointer; }
+  button[aria-pressed="true"] { background:var(--ink); color:var(--paper); }
+  #sentence { font-size: 22px; max-width: 34rem; }
+  .noscript { border:1px solid var(--line); padding:12px; }
+  @media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
+</style>
+</head>
+<body>
+<main>
+  <p><a href="../index.html">Playwith.ideas</a></p>
+  <h1>The Test Says Yes</h1>
+  <p>A thousand people. A few of them are sick. A test flags some of them, and some who are not. Hide everyone the test cleared, and look at who is left.</p>
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <p id="sentence" aria-live="polite"></p>
+  <label>People with the condition, out of 1,000 <output id="oPrev">10</output>
+    <input id="prev" type="range" min="1" max="200" value="10"></label>
+  <label>How often the test catches someone who has it <output id="oSens">90</output>%
+    <input id="sens" type="range" min="50" max="100" value="90"></label>
+  <label>How often the test flags someone who does not <output id="oFp">9</output>%
+    <input id="fp" type="range" min="0" max="20" value="9"></label>
+  <button id="hide" type="button" aria-pressed="false">Show only the positives</button>
+  <button class="preset" type="button" data-p="10" data-s="90" data-f="9">Rare disease</button>
+  <button class="preset" type="button" data-p="150" data-s="80" data-f="10">Common flu</button>
+  <button class="preset" type="button" data-p="10" data-s="99" data-f="1">Nearly perfect test</button>
+  <p>The ringed dots are the ones the test flags. The pale dots with a red rim are the people who have the condition. A positive result is the chance you are looking at a pale ringed dot, not merely a ringed one.</p>
+  <noscript><p class="noscript">With scripts off: at 10 sick in 1,000, a test that catches 90% of them and flags 9% of the healthy people marks about 98 people. Nine of those 98 are sick. A positive result is about a 9% chance.</p></noscript>
+</main>
+<script>
+(function () {
+  var dots = document.getElementById("dots");
+  var cells = [];
+  for (var i = 0; i < 1000; i++) {
+    var el = document.createElement("i");
+    el.className = "dot";
+    dots.appendChild(el);
+    cells.push(el);
+  }
+  var prev = document.getElementById("prev");
+  var sens = document.getElementById("sens");
+  var fp = document.getElementById("fp");
+  var hide = document.getElementById("hide");
+  function render() {
+    var p = +prev.value, s = +sens.value / 100, f = +fp.value / 100;
+    document.getElementById("oPrev").textContent = p;
+    document.getElementById("oSens").textContent = sens.value;
+    document.getElementById("oFp").textContent = fp.value;
+    var truePos = Math.round(p * s);
+    var falsePos = Math.round((1000 - p) * f);
+    var flagged = truePos + falsePos;
+    var chance = flagged ? Math.round(100 * truePos / flagged) : 0;
+    for (var i = 0; i < 1000; i++) {
+      var sick = i < p;
+      var positive = sick ? i < truePos : (i - p) < falsePos;
+      cells[i].className = "dot" + (sick ? " sick" : "") + (positive ? " pos" : "") + (hide.getAttribute("aria-pressed") === "true" && !positive ? " hidden" : "");
+    }
+    document.getElementById("sentence").textContent = flagged + " people are flagged, " + truePos + " of them are truly sick, and a positive result means a " + chance + " percent chance.";
+  }
+  [prev, sens, fp].forEach(function (el) { el.addEventListener("input", render); });
+  hide.addEventListener("click", function () {
+    hide.setAttribute("aria-pressed", hide.getAttribute("aria-pressed") === "true" ? "false" : "true");
+    hide.textContent = hide.getAttribute("aria-pressed") === "true" ? "Show everyone" : "Show only the positives";
+    render();
+  });
+  document.querySelectorAll(".preset").forEach(function (b) {
+    b.addEventListener("click", function () {
+      prev.value = b.dataset.p; sens.value = b.dataset.s; fp.value = b.dataset.f; render();
+    });
+  });
+  render();
+})();
+</script>
+</body>
+</html>
