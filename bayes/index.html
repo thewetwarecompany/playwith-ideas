@@ -73,7 +73,7 @@
       var positive = sick ? i < truePos : (i - p) < falsePos;
       cells[i].className = "dot" + (sick ? " sick" : "") + (positive ? " pos" : "") + (hide.getAttribute("aria-pressed") === "true" && !positive ? " hidden" : "");
     }
-    document.getElementById("sentence").textContent = flagged + " people are flagged, " + truePos + " of them are truly sick, and a positive result means a " + chance + " percent chance.";
+    document.getElementById("sentence").textContent = flagged + " people are flagged, " + truePos + " of them are truly sick, and a positive result means a " + chance + " per cent chance.";
   }
   [prev, sens, fp].forEach(function (el) { el.addEventListener("input", render); });
   hide.addEventListener("click", function () {
