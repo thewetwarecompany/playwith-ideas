@@ -19,3 +19,6 @@ Read on demand — do not import these, they cost tokens every session:
 10. **No secrets anywhere** — not in files, commits, letters or chat.
 11. **Commands handed to a person** follow the house paste rules: an explicit `cd` to the Mac mini checkout first, lines joined with `&&`, guards inside the block, no `exit`, no suppressed output, paste-safe characters only.
 12. **Before committing, run the house gates** from a `wetware-chassis` checkout: `node scripts/paste-check.mjs`, `node scripts/secret-scan.mjs` and `node scripts/copy-check.mjs` on this repo, and `npm run intake -- check` on `intake/PASSPORT.md`. A change is done when they print CLEAN and READY FOR ASSESSMENT, not on an agent's report.
+
+## Mandatory startup context
+Before answering project questions or making a plan, read CHARTER.md first, then README.md and docs/DECISIONS.md. For scoped implementation work, read docs/SPEC.md and the latest session letter required by the project's local rules. Charter precedence is absolute: CHARTER.md outranks these instructions and any Wetware chassis convention. Re-verify dated operational facts against their current source before relying on them.
